@@ -10,6 +10,7 @@
     "debian": ">= 0.0.0",
     "fedora": ">= 0.0.0",
     "suse": ">= 0.0.0",
+    "opensuse": ">= 0.0.0",
     "amazon": ">= 0.0.0",
     "redhat": "~> 6.0",
     "centos": "~> 6.0",
@@ -50,8 +51,7 @@
     "postgresql::server_redhat": "Installs postgresql server packages, redhat family style",
     "postgresql::server_debian": "Installs postgresql server packages, debian family style"
   },
-  "version": "3.4.21",
+  "version": "3.4.24",
   "source_url": "",
-  "issues_url": "",
-  "privacy": false
+  "issues_url": ""
 }
