@@ -18,15 +18,9 @@
 #
 
 # To force removing of mariadb-libs on CentOS >= 7
-package 'MariaDB-shared' do
-  action :install
-end
 
-package 'MariaDB-Galera-server' do
-  action :install
-  notifies :create, 'directory[/var/log/mysql]', :immediately
-  notifies :start, 'service[mysql]', :immediately
-  notifies :run, 'execute[change first install root password]', :immediately
+execute "maria-db_install" do
+  command "yum group install -y mariadb"
 end
 
 directory '/var/log/mysql' do
@@ -34,10 +28,6 @@ directory '/var/log/mysql' do
   user 'mysql'
   group 'mysql'
   mode '0755'
-end
-
-service 'mysql' do
-  action :nothing
 end
 
 execute 'change first install root password' do

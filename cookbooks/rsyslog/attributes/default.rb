@@ -2,7 +2,7 @@
 # Cookbook Name:: rsyslog
 # Attributes:: default
 #
-# Copyright 2009-2015, Chef Software, Inc.
+# Copyright 2009-2014, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ default['rsyslog']['server']                    = false
 default['rsyslog']['use_relp']                  = false
 default['rsyslog']['relp_port']                 = 20_514
 default['rsyslog']['protocol']                  = 'tcp'
-default['rsyslog']['bind']                      = '*'
 default['rsyslog']['port']                      = 514
 default['rsyslog']['server_ip']                 = nil
 default['rsyslog']['server_search']             = 'role:loghost'
@@ -37,7 +36,7 @@ default['rsyslog']['repeated_msg_reduction']    = 'on'
 default['rsyslog']['logs_to_forward']           = '*.*'
 default['rsyslog']['enable_imklog']             = true
 default['rsyslog']['config_prefix']             = '/etc'
-default['rsyslog']['default_file_template']     = nil
+default['rsyslog']['default_file_template']    = nil
 default['rsyslog']['default_remote_template']   = nil
 default['rsyslog']['rate_limit_interval']       = nil
 default['rsyslog']['rate_limit_burst']          = nil
@@ -49,7 +48,6 @@ default['rsyslog']['tls_key_file']              = nil
 default['rsyslog']['tls_auth_mode']             = 'anon'
 default['rsyslog']['use_local_ipv4']            = false
 default['rsyslog']['allow_non_local']           = false
-default['rsyslog']['custom_remote']             = [{}]
 default['rsyslog']['additional_directives'] = {}
 
 # The most likely platform-specific attributes
@@ -71,7 +69,7 @@ when 'rhel', 'fedora'
     'authpriv.*' => "#{node['rsyslog']['default_log_dir']}/secure",
     'mail.*' => "-#{node['rsyslog']['default_log_dir']}/maillog",
     'cron.*' => "#{node['rsyslog']['default_log_dir']}/cron",
-    '*.emerg' => ':omusrmsg:*',
+    '*.emerg' => '*',
     'uucp,news.crit' => "#{node['rsyslog']['default_log_dir']}/spooler",
     'local7.*' => "#{node['rsyslog']['default_log_dir']}/boot.log"
   }
@@ -97,13 +95,8 @@ else
     'news.notice' => "-#{node['rsyslog']['default_log_dir']}/news/news.notice",
     '*.=debug;auth,authpriv.none;news.none;mail.none' => "-#{node['rsyslog']['default_log_dir']}/debug",
     '*.=info;*.=notice;*.=warn;auth,authpriv.none;cron,daemon.none;mail,news.none' => "-#{node['rsyslog']['default_log_dir']}/messages",
-    '*.emerg' => ':omusrmsg:*'
+    '*.emerg' => '*'
   }
-end
-
-# rsyslog 3/4 do not support the new :omusrmsg:* format and need * instead
-if (node['platform'] == 'ubuntu' && node['platform_version'].to_i < 12) || (node['platform_family'] == 'rhel' && node['platform_version'].to_i < 6)
-  default['rsyslog']['default_facility_logs']['*.emerg'] = '*'
 end
 
 # platform specific attributes

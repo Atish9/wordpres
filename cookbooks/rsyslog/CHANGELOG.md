@@ -2,41 +2,7 @@ rsyslog Cookbook CHANGELOG
 ==========================
 This file is used to list changes made in each version of the rsyslog cookbook.
 
-v.3.0.0 (2015-11-09)
-----------
-- Breaking change: The file_input LWRP has been updated to be a Chef 12.5 custom_resource, with backwards compatibility to all Chef 12.x released provided by compat_resource. Additionally the 'source' and 'cookbook' attributes in the file_input resource have been renamed to 'template_source' and 'cookbook_source' to prevent failures.
-- Helpers for determining the service provider on Ubuntu have been removed since Chef 12 does the right thing with Init, Upstart, and systemd.
-- rsyslog::client no longer fails if there are no servers to forward logs to. Instead forwarding isn't configuring and a warning is written to the chef client log
-- Fix broken templating of /etc/rsyslog.d/49-remote.conf when relp was enabled.  Added testing to prevent future regressions here.
-- Test Kitchen integration tests are now run via Travis so all PRs will be fully tested
-
-v.2.2.0 (2015-10-05)
-----------
-- Add why-run support to the file_input LWRP
-- Added support for rsyslog under systemd on Ubuntu 15.04+
-- Added new attribute node['rsyslog']['custom_remote'].  See readme for additional information
-- Added source_url and issues_url metadata for Supermarket
-- Fixed 49-relp.conf to honor logs_to_forward so it didn't just forward everything
-- Updated contributing and testing docs
-- Set the minimum supported Chef release to 11.0
-- Added maintainers.toml and maintainers.md files
-- Added Amazon Linux, Oracle, and Scientific Linux to the metadata
-- Removed all pre-Ruby 1.9 hash rockets
-- Updated development dependencies in the
-- Fix a bad example attribute in the readme
-- Updated Travis CI config to test on all modern Ruby releases
-
-v.2.1.0 (2015-07-22)
-----------
-- Fixed minor markdown errors in the readme
-- Allow the server to listen on both TCP and UDP.  For both set node['rsyslog']['protocol'] to 'udptcp'
-- Move the include for /etc/rsyslog.d/ to the very end of the rsyslog.conf config
-- Added the ability to bind to a specific IP when running the server on UDP with node['rsyslog']['bind']
-- Sync the comments in the rsyslog.conf file with the latest upstream rsyslog release
-- Change emerg to log to :omusrmsg:* vs. * on modern rsyslog releases to avoid deprecation warnings
-
 v.2.0.0 (2015-05-18)
---------------------
 Note: This version includes several breaking changes for Ubuntu users. Be sure to take care when deploying these changes to production systems.
 
 - 49-relp.conf now properly uses the list of servers discovered in the client recipe

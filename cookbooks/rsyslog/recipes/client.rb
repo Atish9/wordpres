@@ -2,7 +2,7 @@
 # Cookbook Name:: rsyslog
 # Recipe:: client
 #
-# Copyright 2009-2015, Chef Software, Inc.
+# Copyright 2009-2014, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,15 +19,21 @@
 
 # Do not run this recipe if the server attribute is set
 return if node['rsyslog']['server']
+
 include_recipe 'rsyslog::default'
 
-extend RsyslogCookbook::Helpers
+def chef_solo_search_installed?
+  klass = ::Search.const_get('Helper')
+  return klass.is_a?(Class)
+rescue NameError
+  return false
+end
 
 # On Chef Solo, we use the node['rsyslog']['server_ip'] attribute, and on
 # normal Chef, we leverage the search query.
 if Chef::Config[:solo] && !chef_solo_search_installed?
   if node['rsyslog']['server_ip']
-    server_ips = Array(node['rsyslog']['server_ip'])
+    rsyslog_servers = Array(node['rsyslog']['server_ip'])
   else
     Chef::Application.fatal!("Chef Solo does not support search. You must set node['rsyslog']['server_ip'] or use the chef-solo-search cookbook!")
   end
@@ -41,38 +47,23 @@ else
     end
     ipaddress
   end
-  server_ips = Array(node['rsyslog']['server_ip']) + Array(results)
-end
-
-rsyslog_servers = []
-
-server_ips.each do |ip|
-  rsyslog_servers << { 'server' => ip, 'port' => node['rsyslog']['port'], 'logs' => node['rsyslog']['logs_to_forward'], 'protocol' => node['rsyslog']['protocol'], 'remote_template' => node['rsyslog']['default_remote_template'] }
-end
-
-unless node['rsyslog']['custom_remote'].first.empty?
-  node['rsyslog']['custom_remote'].each do |server|
-    if server['server'].nil?
-      Chef::Application.fatal!('Found a custom_remote server with no IP. Check your custom_remote attribute definition!')
-    end
-  end
-  rsyslog_servers += node['rsyslog']['custom_remote']
+  rsyslog_servers = Array(node['rsyslog']['server_ip']) + Array(results)
 end
 
 if rsyslog_servers.empty?
-  Chef::Log.warn('The rsyslog::client recipe was unable to determine the remote syslog server. Checked both the server_ip attribute and search! Not forwarding logs.')
-else
-  remote_type = node['rsyslog']['use_relp'] ? 'relp' : 'remote'
+  Chef::Application.fatal!('The rsyslog::client recipe was unable to determine the remote syslog server. Checked both the server_ip attribute and search!')
+end
 
-  template "#{node['rsyslog']['config_prefix']}/rsyslog.d/49-remote.conf" do
-    source    "49-#{remote_type}.conf.erb"
-    owner     'root'
-    group     'root'
-    mode      '0644'
-    variables(servers: rsyslog_servers)
-    notifies  :restart, "service[#{node['rsyslog']['service_name']}]"
-    only_if   { node['rsyslog']['remote_logs'] }
-  end
+remote_type = node['rsyslog']['use_relp'] ? 'relp' : 'remote'
+
+template "#{node['rsyslog']['config_prefix']}/rsyslog.d/49-remote.conf" do
+  source    "49-#{remote_type}.conf.erb"
+  owner     'root'
+  group     'root'
+  mode      '0644'
+  variables(:servers => rsyslog_servers)
+  notifies  :restart, "service[#{node['rsyslog']['service_name']}]"
+  only_if   { node['rsyslog']['remote_logs'] }
 end
 
 file "#{node['rsyslog']['config_prefix']}/rsyslog.d/server.conf" do
