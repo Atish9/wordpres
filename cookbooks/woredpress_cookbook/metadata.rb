@@ -1,6 +1,6 @@
 name             'woredpress_cookbook'
-maintainer       'YOUR_COMPANY_NAME'
-maintainer_email 'YOUR_EMAIL'
+maintainer       'SOLUTION_ENTERPRISES'
+maintainer_email 'das90.atish@gmail.com'
 license          'All rights reserved'
 description      'Installs/Configures woredpress_cookbook'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
@@ -18,3 +18,4 @@ depends 'mysql2_chef_gem'
 depends 'php'
 depends 'httpd'
 depends 'openssl'
+depends 'php-fpm'

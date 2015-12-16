@@ -12,7 +12,7 @@
 # end
 
 
-package ['php', 'php-pdo','php-mysql']  do
+package ['php', 'php-pdo','php-mysql','php-fpm']  do
   action :install
 end
 

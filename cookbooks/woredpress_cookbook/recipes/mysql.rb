@@ -14,15 +14,15 @@
 
 
 
-# bash "mysql_installation" do
-#   code <<-EOH
-#   mysql -e "update mysql.user set Password = Password('redhat') where User = 'root'"
-#   mysql -e "drop user ''@'localhost'"
-#   mysql -e "drop database test"
-#   mysql -e "flush privileges"
-#   EOH
-# end
-
+bash "mysql_installation" do
+  code <<-EOH
+  mysql -e "update mysql.user set Password = Password('red') where User = 'root'"
+  mysql -e "drop user ''@'localhost'"
+  mysql -e "drop database test"
+  mysql -e "flush privileges"
+  EOH
+  not_if "mysql -u root -p" do
+end
 
 # mysql_database node.wordpress.mysql.dbname do
 #    connection connection2(
@@ -59,28 +59,29 @@
 #  end
 
 
-mysql_connection_info = {
-  :host     => 'localhost',
-  :username => 'root',
-  :password => node.wordpress.mysql.rootpass
- }
+# mysql_connection_info = {
+#   :host     => 'localhost',
+#   :username => 'root',
+#   :password => node.wordpress.mysql.rootpass
+#  }
 
-mysql_database node.wordpress.mysql.dbname do
-  connection  mysql_connection_info
-  action      :create
-end
+# mysql_database node.wordpress.mysql.dbname do
+#   connection  mysql_connection_info
+#   action      :create
+# end
 
-mysql_database_user node.wordpress.mysql.dbname_username do
-  connection      mysql_connection_info
-  password        node.wordpress.mysql.dbname_userpass
-  host            'localhost'
-  database_name   node.wordpress.mysql.dbname
-  action          :create
-end
+# mysql_database_user node.wordpress.mysql.dbname_username do
+#   connection      mysql_connection_info
+#   password        node.wordpress.mysql.dbname_userpass
+#   host            'localhost'
+#   database_name   node.wordpress.mysql.dbname
+#   action          :create
+# end
 
-mysql_database_user node.wordpress.mysql.dbname_username do
-  connection      mysql_connection_info
-  database_name   node.wordpress.mysql.dbname
-  privileges      [:all]
-  action          :grant
-end 
+# mysql_database_user node.wordpress.mysql.dbname_username do
+#   connection      mysql_connection_info
+#   database_name   node.wordpress.mysql.dbname
+#   privileges      [:all]    
+# require_ssl true
+#   action    :grant
+# end 
